@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startpage // papag</title>
+    <!-- Modern Typography: Inter + Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Fluid background glow tracking cursor -->
+    <div class="cursor-glow" id="cursor-glow"></div>
+    <div class="ambient-mesh"></div>
+    
+    <header class="header">
+        <h1 class="glow-text">Start</h1>
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Find what you need..." autocomplete="off" spellcheck="false">
+            <div class="search-backdrop"></div>
+            <span class="search-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </span>
+        </div>
+        <div class="status-summary" id="status-summary">Checking links...</div>
+    </header>
+
+    <main class="grid-container" id="bookmark-container">
+        <!-- Bookmark categories will be injected here via JS -->
+    </main>
+
+    <!-- Import data and logic -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
