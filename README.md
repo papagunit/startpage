@@ -10,7 +10,8 @@ An ultra-fluid, modern, and dark-themed homepage meant to be statically hosted (
   * Glassmorphism cards with interactive spotlight borders that follow mouse hover events.
 * **Asynchronous Link Status:** 
   * Verifies if each link is still valid in the background on load.
-  * Bypasses client-side Browser Network policies using a CORS proxy (`corsproxy.io`). A queued `fetch` system checks links sequentially to prevent rate limits and UI locks.
+  * Extensively leverages a 1-week `localStorage` caching system (`nexus_link_cache`) to prevent unnecessary network requests and guarantee instantaneous loading.
+  * Bypasses client-side Browser Network policies using a CORS proxy. A queued `fetch` system checks uncached links sequentially to prevent rate limits and UI locks.
 * **Real-time Fuzzy Search:** 
   * Instantly filters bookmarks matching either the text name or the target URL natively via JavaScript.
 
@@ -27,7 +28,8 @@ To maintain this simplicity in the future, adhere to the following architecture 
    * Uses CSS variables heavily. To change the brand colors (cyan, purple) or the glow intensity, update the `:root` variables.
    * Modifying the "spotlight" radius effect on cards is done in the `.card-spotlight` class.
 3. **JS Logic (`script.js`):**
-   * Holds the queue mechanism (`linkCheckQueue`) limiting how many CORS proxy requests are executed per second (`chunk.splice(0, 3)`). 
+   * Uses `localStorage.getItem('nexus_link_cache')` with a 7-day expiration (`CACHE_EXPIRE_MS`). If you need to force-refresh all links, run `localStorage.removeItem('nexus_link_cache')` in the browser console.
+   * Holds the queue mechanism (`linkCheckQueue`) limiting how many proxies requests are executed per second (`chunk.splice(0, 3)`). 
    * Extracts favicons dynamically using the free `google.com/s2/favicons` service.
 
 ## ⚙️ Running Locally
