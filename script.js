@@ -22,6 +22,24 @@ document.addEventListener('DOMContentLoaded', () => {
         try { return new URL(url).hostname; } catch { return ""; }
     };
 
+    // Cache setup
+    const CACHE_KEY = 'nexus_link_cache';
+    const CACHE_EXPIRE_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
+    let linkCache = {};
+    try {
+        linkCache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    } catch (e) {
+        linkCache = {};
+    }
+
+    const saveCache = () => {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(linkCache));
+        } catch (e) {
+            console.warn("Storage quota exceeded or unavailable");
+        }
+    };
+
     // 1. Render Categories and Links
     const render = () => {
         container.innerHTML = '';
@@ -77,14 +95,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusDiv.className = 'status-indicator';
                 const statusId = `status-${index}-${linkIdx}`;
                 statusDiv.id = statusId;
-                statusDiv.innerHTML = '<div class="status-loading"></div>';
+
+                const cached = linkCache[linkObj.url];
+                const now = Date.now();
+                
+                if (cached && (now - cached.timestamp < CACHE_EXPIRE_MS)) {
+                    // Use valid cache
+                    if (cached.status === 'valid') {
+                        statusDiv.innerHTML = `<span class="status-valid">${ICON_SUCCESS}</span>`;
+                        validLinks++;
+                    } else {
+                        statusDiv.innerHTML = `<span class="status-invalid">${ICON_ERROR}</span>`;
+                        invalidLinks++;
+                    }
+                    checkedLinks++;
+                } else {
+                    // Needs checking
+                    statusDiv.innerHTML = '<div class="status-loading"></div>';
+                    linkCheckQueue.push({ url: linkObj.url, id: statusId });
+                }
 
                 a.appendChild(contentDiv);
                 a.appendChild(statusDiv);
                 li.appendChild(a);
                 list.appendChild(li);
-
-                linkCheckQueue.push({ url: linkObj.url, id: statusId });
             });
 
             cardInner.appendChild(list);
@@ -184,15 +218,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (response.ok) {
                     statusDiv.innerHTML = `<span class="status-valid">${ICON_SUCCESS}</span>`;
                     validLinks++;
+                    linkCache[item.url] = { status: 'valid', timestamp: Date.now() };
                 } else {
                     statusDiv.innerHTML = `<span class="status-invalid">${ICON_ERROR}</span>`;
                     invalidLinks++;
+                    linkCache[item.url] = { status: 'invalid', timestamp: Date.now() };
                 }
             } catch (err) {
                 statusDiv.innerHTML = `<span class="status-invalid">${ICON_ERROR}</span>`;
                 invalidLinks++;
+                linkCache[item.url] = { status: 'invalid', timestamp: Date.now() };
             }
             
+            saveCache();
             checkedLinks++;
         }));
 
